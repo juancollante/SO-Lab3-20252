@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 double CalcPi(int n);
@@ -43,17 +44,27 @@ int main(int argc, char **argv)
         return 1;
     }
     
-    // get initial time 
+    // measure time of the calculation
+    struct timespec tstart, tend;
+    if (clock_gettime(CLOCK_MONOTONIC, &tstart) != 0) {
+        perror("clock_gettime");
+        return 1;
+    }
 
     /* the calculation is done here*/
     fPi = CalcPi(n);
 
-    //get final fime
-    
+    if (clock_gettime(CLOCK_MONOTONIC, &tend) != 0) {
+        perror("clock_gettime");
+        return 1;
+    }
+
+    double elapsed = (double)(tend.tv_sec - tstart.tv_sec) +
+                     (double)(tend.tv_nsec - tstart.tv_nsec) / 1e9;
+
     printf("\npi is approximately = %.20f \nError               = %.20f\n",
            fPi, fabs(fPi - fPi25DT));
-    
-    // report time
+    printf("Time (seconds): %.9f\n", elapsed);
 
     return 0;
 }
